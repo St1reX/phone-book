@@ -66,8 +66,8 @@ namespace ksiazkaZDanymi
             string mail = "";
             string dateOfBirth = "";
 
-            StringLengthAttribute nameSurnameValidation = new StringLengthAttribute(50);
-            nameSurnameValidation.MinimumLength = 1;
+            string nameSurnameValidationPattern = "^[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$";
+            Regex nameSurnameValidation = new Regex(nameSurnameValidationPattern);
 
             string dateValidationPattern = "^(?:\\d{4}[-/]\\d{2}[-/]\\d{2})$";
             Regex dateValidation = new Regex(dateValidationPattern);
@@ -78,11 +78,17 @@ namespace ksiazkaZDanymi
                 {
                     Console.WriteLine("Enter new user name: ");
                     name = Console.ReadLine();
-                    nameSurnameValidation.Validate(name, "name");
+                    if (nameSurnameValidation.IsMatch(name) == false)
+                    {
+                        throw new ValidationException("Pole name musi być poprawnie podanym ciągiem znaków. Dozwolone są tylko litery.");
+                    }
 
                     Console.WriteLine("Enter new user surname: ");
                     surname = Console.ReadLine();
-                    nameSurnameValidation.Validate(surname, "name");
+                    if (nameSurnameValidation.IsMatch(name) == false)
+                    {
+                        throw new ValidationException("Pole surnname musi być poprawnie podanym ciągiem znaków. Dozwolone są tylko litery.");
+                    }
 
                     Console.WriteLine("Enter new user phone number (eg. 222-222-222): ");
                     phoneNumber = Console.ReadLine();
@@ -126,35 +132,152 @@ namespace ksiazkaZDanymi
                 }
             }
 
+            commandHolder.Reset();
             Console.WriteLine("User successfully added.");
             Console.WriteLine("Press any button to return.");
             Console.ReadKey();
             Console.Clear();
         }
 
-        public void DisplayListMembers()
+        public void DisplayListMembers(int elementsAmount = 4)
         {
             Console.Clear();
 
             commandHolder.CommandText = "SELECT * FROM Persons";
 
-            var persons = commandHolder.ExecuteReader();
+            var person = commandHolder.ExecuteReader();
 
-            while (persons.Read())
-            {
-                Console.WriteLine(
-                    $"{persons[0]}. {{ \n \t" +
-                    $"Name: {persons[1]} \n \t" +
-                    $"Surname: {persons[2]} \n \t" +
-                    $"Phone Number: {persons[3]} \n \t" +
-                    $"Mail: {persons[4]} \n \t" +
-                    $"Date of Birth: {persons[5]} \n" +
-                    $"}}");
+            char actionKey;
+
+            int index = 1;
+
+            List<Person> personsList = new List<Person>();
+
+
+            while (person.Read())
+            {  
+                personsList.Add(Person.CreateUser(System.Convert.ToInt32(person[0]), person[1].ToString(), person[2].ToString(), person[3].ToString(), person[4].ToString(), person[5].ToString()));
             }
 
-            Console.WriteLine("Press any button to return.");
-            Console.ReadKey();
+            
+            do
+            {
+                Console.Clear();
+                Console.WriteLine("Use {< >} to navigate between sites.\n Press any other key to exit.");
+
+                for(int i = (index-1) * elementsAmount; i < index*elementsAmount && i < personsList.Count; i++)
+                {
+                    Console.WriteLine(
+                    $"{personsList[i].ID}. {{ \n \t" +
+                    $"Name: {personsList[i].Name} \n \t" +
+                    $"Surname: {personsList[i].Surname} \n \t" +
+                    $"Phone Number: {personsList[i].PhoneNumber} \n \t" +
+                    $"Mail: {personsList[i].Email} \n \t" +
+                    $"Date of Birth: {personsList[i].DateOfBirth} \n" +
+                    $"}}");
+                }
+
+                actionKey = Console.ReadKey().KeyChar;
+
+                if(actionKey == '>')
+                {
+                    index = index + 1 > Math.Ceiling(personsList.Count / 4.0) ? 1 : index + 1;
+                    continue;
+                }
+                else if (actionKey == '<')
+                {
+                    index = index - 1 < 1 ? (int)Math.Ceiling(personsList.Count / 4.0) : index - 1;
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+            while (actionKey == '<' || actionKey == '>');
+
             Console.Clear();
+            commandHolder.Reset();
+            return;
+        }
+
+        public void DisplayListMembersFunctional(int elementsAmount = 4)
+        {
+            Console.Clear();
+
+            commandHolder.CommandText = "SELECT * FROM Persons";
+
+            var person = commandHolder.ExecuteReader();
+
+            char actionKey;
+
+            int index = 1;
+
+            int selectedPerson;
+
+            List<Person> personsList = new List<Person>();
+
+
+            while (person.Read())
+            {
+                personsList.Add(Person.CreateUser(System.Convert.ToInt32(person[0]), person[1].ToString(), person[2].ToString(), person[3].ToString(), person[4].ToString(), person[5].ToString()));
+            }
+
+
+            do
+            {
+                Console.Clear();
+                Console.WriteLine("Use {< >} to navigate between sites.\n Press any other key to exit.");
+
+                selectedPerson = index-1 * elementsAmount;
+
+                for (int i = (index - 1) * elementsAmount; i < index * elementsAmount && i < personsList.Count; i++)
+                {
+                    if(i == selectedPerson)
+                    {
+                        Console.BackgroundColor = ConsoleColor.Green;
+
+                        Console.WriteLine(
+                        $"{personsList[i].ID}. {{ \n \t" +
+                        $"Name: {personsList[i].Name} \n \t" +
+                        $"Surname: {personsList[i].Surname} \n \t" +
+                        $"Phone Number: {personsList[i].PhoneNumber} \n \t" +
+                        $"Mail: {personsList[i].Email} \n \t" +
+                        $"Date of Birth: {personsList[i].DateOfBirth} \n" +
+                        $"}}");
+
+                        Console.BackgroundColor = ConsoleColor.Black;
+
+                        continue;
+                    }
+                    
+                }
+
+                actionKey = Console.ReadKey().KeyChar;
+
+                switch(actionKey)
+                {
+                    case '>':
+                        index = index + 1 > Math.Ceiling(personsList.Count / 4.0) ? 1 : index + 1;
+                        continue;
+                    case '<':
+                        index = index - 1 < 1 ? (int)Math.Ceiling(personsList.Count / 4.0) : index - 1;
+                        continue;
+                    case ']':
+                        selectedPerson = selectedPerson + 1 >= index * elementsAmount ? index - 1 * elementsAmount : index + 1;
+                        continue;
+                    case '[':
+                        selectedPerson = selectedPerson - 1 < index-1 * elementsAmount ? index * elementsAmount - 1 : index - 1;
+                        continue;
+                    default: break;
+                }
+
+            }
+            while (actionKey == '<' || actionKey == '>');
+
+            Console.Clear();
+            commandHolder.Reset();
+            return;
         }
 
         public void DeleteFromList()

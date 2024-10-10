@@ -15,9 +15,9 @@ namespace ksiazkaZDanymi
         public string Email { get; set; }
         public string DateOfBirth { get; set; }
 
-        static public Person CreateUser(int Id, string name, string surname, string phoneNumber)
+        static public Person CreateUser(int Id, string name, string surname, string phoneNumber, string mail, string dateOfBirth)
         {
-            return new Person { ID = Id, Name = name, Surname = surname, PhoneNumber = phoneNumber };
+            return new Person { ID = Id, Name = name, Surname = surname, PhoneNumber = phoneNumber, Email = mail, DateOfBirth = dateOfBirth };
         }
 
     }
