@@ -9,6 +9,7 @@ using System.Data.SQLite;
 using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace ksiazkaZDanymi
 {
@@ -114,7 +115,7 @@ namespace ksiazkaZDanymi
                     commandHolder.Parameters.AddWithValue("@mail", mail);
                     commandHolder.Parameters.AddWithValue("@dateOfBirth", dateOfBirth);
 
-                    var userAdd = commandHolder.ExecuteNonQuery();
+                    commandHolder.ExecuteNonQuery();
                     break;
                 }
                 catch (ValidationException ex)
@@ -153,19 +154,18 @@ namespace ksiazkaZDanymi
 
             List<Person> personsList = new List<Person>();
 
-
             while (person.Read())
             {  
                 personsList.Add(Person.CreateUser(System.Convert.ToInt32(person[0]), person[1].ToString(), person[2].ToString(), person[3].ToString(), person[4].ToString(), person[5].ToString()));
             }
-
-            
+       
             do
             {
                 Console.Clear();
-                Console.WriteLine("Use {< >} to navigate between sites.\n Press any other key to exit.");
 
-                for(int i = (index-1) * elementsAmount; i < index*elementsAmount && i < personsList.Count; i++)
+                Console.WriteLine("Use {< >} to navigate between pages. \nPress any other key to exit.");
+
+                for (int i = (index-1) * elementsAmount; i < index*elementsAmount && i < personsList.Count; i++)
                 {
                     Console.WriteLine(
                     $"{personsList[i].ID}. {{ \n \t" +
@@ -182,17 +182,11 @@ namespace ksiazkaZDanymi
                 if(actionKey == '>')
                 {
                     index = index + 1 > Math.Ceiling(personsList.Count / 4.0) ? 1 : index + 1;
-                    continue;
                 }
                 else if (actionKey == '<')
                 {
                     index = index - 1 < 1 ? (int)Math.Ceiling(personsList.Count / 4.0) : index - 1;
                 }
-                else
-                {
-                    break;
-                }
-
             }
             while (actionKey == '<' || actionKey == '>');
 
@@ -201,7 +195,7 @@ namespace ksiazkaZDanymi
             return;
         }
 
-        public void DisplayListMembersFunctional(int elementsAmount = 4)
+        public int DisplayListMembersFunctional(int elementsAmount = 4)
         {
             Console.Clear();
 
@@ -213,7 +207,7 @@ namespace ksiazkaZDanymi
 
             int index = 1;
 
-            int selectedPerson;
+            int selectedPerson = 0;
 
             List<Person> personsList = new List<Person>();
 
@@ -224,18 +218,17 @@ namespace ksiazkaZDanymi
             }
 
 
-            do
+            while (true)
             {
                 Console.Clear();
-                Console.WriteLine("Use {< >} to navigate between sites.\n Press any other key to exit.");
-
-                selectedPerson = index-1 * elementsAmount;
+                Console.WriteLine("Use {< >} to navigate between sites and {[ ]} to change selected person.\n Press any other key to exit.");
 
                 for (int i = (index - 1) * elementsAmount; i < index * elementsAmount && i < personsList.Count; i++)
                 {
+
                     if(i == selectedPerson)
                     {
-                        Console.BackgroundColor = ConsoleColor.Green;
+                        Console.ForegroundColor = ConsoleColor.Green;
 
                         Console.WriteLine(
                         $"{personsList[i].ID}. {{ \n \t" +
@@ -246,11 +239,19 @@ namespace ksiazkaZDanymi
                         $"Date of Birth: {personsList[i].DateOfBirth} \n" +
                         $"}}");
 
-                        Console.BackgroundColor = ConsoleColor.Black;
-
+                        Console.ResetColor();
                         continue;
                     }
-                    
+
+                    Console.WriteLine(
+                    $"{personsList[i].ID}. {{ \n \t" +
+                    $"Name: {personsList[i].Name} \n \t" +
+                    $"Surname: {personsList[i].Surname} \n \t" +
+                    $"Phone Number: {personsList[i].PhoneNumber} \n \t" +
+                    $"Mail: {personsList[i].Email} \n \t" +
+                    $"Date of Birth: {personsList[i].DateOfBirth} \n" +
+                    $"}}");
+
                 }
 
                 actionKey = Console.ReadKey().KeyChar;
@@ -259,60 +260,125 @@ namespace ksiazkaZDanymi
                 {
                     case '>':
                         index = index + 1 > Math.Ceiling(personsList.Count / 4.0) ? 1 : index + 1;
+                        selectedPerson = (index - 1) * elementsAmount;
                         continue;
                     case '<':
                         index = index - 1 < 1 ? (int)Math.Ceiling(personsList.Count / 4.0) : index - 1;
+                        selectedPerson = (index - 1) * elementsAmount;
                         continue;
                     case ']':
-                        selectedPerson = selectedPerson + 1 >= index * elementsAmount ? index - 1 * elementsAmount : index + 1;
+                        selectedPerson = selectedPerson + 1 >= index * elementsAmount || selectedPerson + 1 >= personsList.Count ? (index - 1) * elementsAmount : selectedPerson + 1;
                         continue;
                     case '[':
-                        selectedPerson = selectedPerson - 1 < index-1 * elementsAmount ? index * elementsAmount - 1 : index - 1;
+                        selectedPerson = selectedPerson - 1 < (index-1) * elementsAmount ? index * elementsAmount - 1 : selectedPerson - 1;
+                        if(selectedPerson > personsList.Count)
+                        {
+                            selectedPerson = personsList.Count - 1;
+                        }
                         continue;
-                    default: break;
+                    case (char)13:
+                        Console.Clear();
+                        commandHolder.Reset();
+
+                        return personsList[selectedPerson].ID;
+                    default:
+                        return -1;
                 }
 
             }
-            while (actionKey == '<' || actionKey == '>');
-
-            Console.Clear();
-            commandHolder.Reset();
-            return;
         }
 
         public void DeleteFromList()
         {
             Console.Clear();
 
-            int id = 0;
+            int personToDelete;
 
-            Console.WriteLine("Enter id of user which should be removed");
-            id = System.Convert.ToInt32(Console.ReadLine());
+            char actionKey;
 
+            int selectedOption = 0;
 
-            if (id < 0 || id > persons[persons.Count - 1].ID)
+            string[] options = { "YES", "NO" };
+
+            while (true)
             {
-                throw new IndexOutOfRangeException("Provided ID is out of the current list indexes");
+                personToDelete = DisplayListMembersFunctional();
+
+                if (personToDelete == -1)
+                {
+                    commandHolder.Reset();
+                    Console.Clear();
+                    return;
+                }
+
+                while(true)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Use {[ ]} to change selected option.\n Press any other key to exit.");
+
+                    Console.WriteLine($"Are you sure you want to delete user with ID: {personToDelete}");
+
+                    for (int i = 0; i < options.Length; i++)
+                    {
+                        if (i == selectedOption)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+
+                            Console.WriteLine(options[i]);
+
+                            Console.ResetColor();
+                            continue;
+                        }
+
+                        Console.WriteLine(options[i]);
+                    }
+
+                    actionKey = Console.ReadKey().KeyChar;
+
+                    switch (actionKey)
+                    {
+                        case ']':
+                            selectedOption = selectedOption + 1 >= options.Length ? 0 : selectedOption + 1;
+                            continue;
+                        case '[':
+                            selectedOption = selectedOption - 1 < 0 ? options.Length - 1 : selectedOption - 1;
+                            continue;
+                        case (char)13:
+                            if (selectedOption == 0) 
+                            {
+                                commandHolder.CommandText = "DELETE FROM Persons WHERE person_id = @person_id";
+                                commandHolder.Parameters.AddWithValue("@person_id", personToDelete);
+                                commandHolder.ExecuteNonQuery();
+                            }
+                            else
+                            {
+                                commandHolder.Reset();
+                                Console.Clear();
+                                return;
+                            }
+
+                            break;
+                        default:
+                            commandHolder.Reset();
+                            Console.Clear();
+                            return;
+                    }
+
+                    break;
+                }
+
+                Console.WriteLine("User deleted. Do you want to delete another? Press Y for Yes, any other key to exit.");
+
+                commandHolder.Reset();
+
+                if (Console.ReadKey().Key != ConsoleKey.Y)
+                {
+                    break; 
+                }
             }
-            else
-            {
-                persons.RemoveAll(element => element.ID == id);
-            }
 
-            File.WriteAllText(path, string.Empty);
-
-            StreamWriter sr = new StreamWriter(path);
-
-            foreach (Person p in persons)
-            {
-                sr.WriteLine($"{p.ID} {p.Name} {p.Surname} {p.PhoneNumber};");
-            }
-
-            sr.Close();
-
-            Console.WriteLine("Press any button to return.");
-            Console.ReadKey();
             Console.Clear();
+
         }
 
         public void ModifyListMember()
@@ -401,6 +467,7 @@ namespace ksiazkaZDanymi
                         Console.WriteLine("End of the program.");
                         return;
                     default:
+                        Console.Clear();
                         Console.WriteLine("Option you selected is not available.");
                         break;
                 }
