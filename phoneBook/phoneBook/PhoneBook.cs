@@ -36,10 +36,6 @@ namespace ksiazkaZDanymi
 
                 ShowMenu();
             }
-            catch(SqlException ex)
-            {
-                Console.WriteLine("An SQL error occurred while connecting to database: " + ex.Message);
-            }
             catch (Exception ex)
             {
                 Console.WriteLine($"Unknown error occurred. Please restart the program or contact our support team. Error communicate: {ex.Message}");
@@ -83,13 +79,9 @@ namespace ksiazkaZDanymi
 
                 commandHolder = connection.CreateCommand();
             }
-            catch(SqlException) 
-            {
-                throw;
-            }
             catch (Exception)
             {
-                throw;
+                throw new Exception("Problem ocurred while creating connection with database.");
             }
         }
 
@@ -115,13 +107,9 @@ namespace ksiazkaZDanymi
 
                 reader.Close();
             }
-            catch(SqlException)
-            {
-                throw;
-            }
             catch(Exception)
             {
-                throw;
+                throw new Exception("Problem occurred while fetching records from database.");
             }
         }
 
@@ -403,10 +391,6 @@ namespace ksiazkaZDanymi
 
                 Console.WriteLine("User successfully added.");
             }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("An error occurred while adding the user: " + ex.Message);
-            }
             catch(Exception ex)
             {
                 Console.WriteLine("An error occurred while adding the user: " + ex.Message);
@@ -686,7 +670,6 @@ namespace ksiazkaZDanymi
                     Console.WriteLine("2. Add new user");
                     Console.WriteLine("3. Display all users");
                     Console.WriteLine("4. Modify user (selectable)");
-                    Console.WriteLine("5. Clear console");
                     Console.WriteLine("6. Terminate the program");
 
                     char choice = Console.ReadKey().KeyChar;
@@ -707,8 +690,7 @@ namespace ksiazkaZDanymi
                             ModifyListMember();
                             break;
                         case '5':
-                            Console.Clear();
-                            Console.WriteLine("Console cleared");
+                            
                             break;
                         case '6':
                             Console.WriteLine("End of the program.");
@@ -718,13 +700,10 @@ namespace ksiazkaZDanymi
                             Console.WriteLine("Option you selected is not available.");
                             break;
                     }
-                }catch(SqlException ex)
-                {
-                    Console.WriteLine(ex.Message);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Unknown error occurred. Please restart the program or contact our support team. Error communicat: {ex.Message}");
+                    Console.WriteLine($"Unknown error occurred. Please restart the program or contact our support team. Error communicate: {ex.Message}");
                 }
                
             }
