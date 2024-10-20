@@ -43,7 +43,7 @@ namespace ksiazkaZDanymi
             
         }
 
-        void CreateDatabaseConnection()
+        private void CreateDatabaseConnection()
         {
             try
             {
@@ -85,14 +85,14 @@ namespace ksiazkaZDanymi
             }
         }
 
-        void FetchPersonsFromDatabase()
+        private void FetchPersonsFromDatabase(string orderBy = null)
         {
             try
             {
-                commandHolder.CommandText = "SELECT * FROM Persons";
-                var reader = commandHolder.ExecuteReader();
-
                 personsList.Clear();
+
+                commandHolder.CommandText = orderBy == null ? "SELECT * FROM Person" : $"SELECT * FROM Persons ORDER BY {orderBy}";
+                var reader = commandHolder.ExecuteReader();
 
                 while (reader.Read())
                 {
@@ -107,13 +107,13 @@ namespace ksiazkaZDanymi
 
                 reader.Close();
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                throw new Exception("Problem occurred while fetching records from database.");
+                throw new Exception("Problem occurred while fetching records from database: \n" + ex.Message);
             }
         }
 
-        public void DisplayListMembers(int elementsAmount = 4)
+        private void DisplayListMembers(bool displaySorted = false, int elementsAmount = 4)
         {
             Console.Clear();
 
@@ -121,10 +121,77 @@ namespace ksiazkaZDanymi
 
             int index = 1;
 
-            FetchPersonsFromDatabase();
-
             try
             {
+
+                if (displaySorted == true)
+                {
+                    int selectedOption = 0;
+
+                    List<string> columns = new List<string>();
+
+
+                    commandHolder.Reset();
+                    commandHolder.CommandText = "PRAGMA table_info(Persons)";
+                    var reader = commandHolder.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        columns.Add(reader["name"].ToString());
+                    }
+
+
+                    while (true)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Select the column by which the records should be sorted.");
+                        Console.WriteLine("Use {[ ]} to change selected option, ENTER to choose. Press any other key to exit.");
+                        Console.WriteLine();
+
+                        for (int i = 0; i < columns.Count; i++)
+                        {
+                            if (i == selectedOption)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+
+                                Console.WriteLine(" > " + columns[i]);
+
+                                Console.ResetColor();
+                                continue;
+                            }
+
+                            Console.WriteLine(columns[i]);
+                        }
+
+                        actionKey = Console.ReadKey().KeyChar;
+
+                        switch (actionKey)
+                        {
+                            case ']':
+                                selectedOption = selectedOption + 1 >= columns.Count ? 0 : selectedOption + 1;
+                                continue;
+                            case '[':
+                                selectedOption = selectedOption - 1 < 0 ? columns.Count - 1 : selectedOption - 1;
+                                continue;
+                            case (char)13:
+                                commandHolder.Reset();
+                                break;
+                            default:
+                                commandHolder.Reset();
+                                Console.Clear();
+                                return;
+                        }
+
+                        break;
+                    }
+
+                    FetchPersonsFromDatabase(columns[selectedOption]);
+                }
+                else
+                {
+                    FetchPersonsFromDatabase();
+                }
+
                 if (personsList.Count == 0)
                 {
                     throw new InvalidOperationException("Table Persons in database are empty. No elements to display.");
@@ -178,7 +245,7 @@ namespace ksiazkaZDanymi
             }
         }
 
-        public int SelectFromListMembers(int elementsAmount = 4)
+        private int SelectFromListMembers(int elementsAmount = 4)
         {
             Console.Clear();
 
@@ -282,7 +349,7 @@ namespace ksiazkaZDanymi
         }
 
 
-        Dictionary<string, string> GetValidatedUserInput()
+        private Dictionary<string, string> GetValidatedUserInput()
         {
             Dictionary<string, string> userInputs = new Dictionary<string, string>();
 
@@ -371,7 +438,7 @@ namespace ksiazkaZDanymi
             return userInputs;
         }
 
-        public void AddToList()
+        private void AddToList()
         {
             Console.Clear();
 
@@ -405,7 +472,7 @@ namespace ksiazkaZDanymi
             }
         }
 
-        public void DeleteFromList()
+        private void DeleteFromList()
         {
             Console.Clear();
 
@@ -528,7 +595,7 @@ namespace ksiazkaZDanymi
 
         }
 
-        public void ModifyListMember()
+        private void ModifyListMember()
         {
             Console.Clear();
 
@@ -661,38 +728,79 @@ namespace ksiazkaZDanymi
 
         private void ShowMenu()
         {
+            char actionKey = ' ';
+
+
+
+            int selectedOption = 0;
+
+            string[] options = { "Delete user (selectable)", "Add new user", "Display all users", "Modify user (selectable)", "Sort users (selectable)", "Terminate the program" };
+
+
             while (true)
             {
                 try
                 {
-                    Console.WriteLine("Choose operation:");
-                    Console.WriteLine("1. Delete user (selectable)");
-                    Console.WriteLine("2. Add new user");
-                    Console.WriteLine("3. Display all users");
-                    Console.WriteLine("4. Modify user (selectable)");
-                    Console.WriteLine("6. Terminate the program");
-
-                    char choice = Console.ReadKey().KeyChar;
-                    Console.WriteLine();
-
-                    switch (choice)
+                    while(true)
                     {
-                        case '1':
+                        Console.Clear();
+                        Console.WriteLine("Welcome to the program 'Phone Book'. \nThis is simple utility working on MySQLite which provides methods to perform particular operations on records concerned persons in database.");
+                        Console.WriteLine("Choose what you want to do by selecting option from the list below.");
+                        Console.WriteLine("Use {[ ]} to change selected option, ENTER to choose.");
+                        Console.WriteLine();
+
+                        for (int i = 0; i < options.Length; i++)
+                        {
+                            if (i == selectedOption)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+
+                                Console.WriteLine(" > " + options[i]);
+
+                                Console.ResetColor();
+                                continue;
+                            }
+
+                            Console.WriteLine(options[i]);
+                        }
+
+                        actionKey = Console.ReadKey().KeyChar;
+
+                        switch (actionKey)
+                        {
+                            case ']':
+                                selectedOption = selectedOption + 1 >= options.Length ? 0 : selectedOption + 1;
+                                continue;
+                            case '[':
+                                selectedOption = selectedOption - 1 < 0 ? options.Length - 1 : selectedOption - 1;
+                                continue;
+                            case (char)13:
+                                break;
+                            default:
+                                continue;
+                        }
+
+                        break;
+                    }
+
+                    switch (selectedOption)
+                    {
+                        case 0:
                             DeleteFromList();
                             break;
-                        case '2':
+                        case 1:
                             AddToList();
                             break;
-                        case '3':
+                        case 2:
                             DisplayListMembers();
                             break;
-                        case '4':
+                        case 3:
                             ModifyListMember();
                             break;
-                        case '5':
-                            
+                        case 4:
+                            DisplayListMembers(true);
                             break;
-                        case '6':
+                        case 5:
                             Console.WriteLine("End of the program.");
                             return;
                         default:
@@ -700,13 +808,14 @@ namespace ksiazkaZDanymi
                             Console.WriteLine("Option you selected is not available.");
                             break;
                     }
+
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Unknown error occurred. Please restart the program or contact our support team. Error communicate: {ex.Message}");
+                    break;
                 }
-               
-            }
+            }                    
         }
     }
 }
