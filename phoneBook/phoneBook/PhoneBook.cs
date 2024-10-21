@@ -124,7 +124,7 @@ namespace ksiazkaZDanymi
         {
             Console.Clear();
 
-            char actionKey;
+            ConsoleKey actionKey;
 
             int index = 1;
 
@@ -152,7 +152,7 @@ namespace ksiazkaZDanymi
                     {
                         Console.Clear();
                         Console.WriteLine("Select the column by which the records should be sorted.");
-                        Console.WriteLine("Use {[ ]} to change selected option, ENTER to choose. Press any other key to exit.");
+                        Console.WriteLine("Use {↑ and ↓} to change selected option, ENTER to choose. Press any other key to exit.");
                         Console.WriteLine();
 
                         for (int i = 0; i < columns.Count; i++)
@@ -170,17 +170,17 @@ namespace ksiazkaZDanymi
                             Console.WriteLine(columns[i]);
                         }
 
-                        actionKey = Console.ReadKey().KeyChar;
+                        actionKey = Console.ReadKey().Key;
 
                         switch (actionKey)
                         {
-                            case ']':
+                            case ConsoleKey.DownArrow:
                                 selectedOption = selectedOption + 1 >= columns.Count ? 0 : selectedOption + 1;
                                 continue;
-                            case '[':
+                            case ConsoleKey.UpArrow:
                                 selectedOption = selectedOption - 1 < 0 ? columns.Count - 1 : selectedOption - 1;
                                 continue;
-                            case (char)13:
+                            case ConsoleKey.Enter:
                                 commandHolder.Reset();
                                 break;
                             default:
@@ -203,7 +203,7 @@ namespace ksiazkaZDanymi
                 {
                     Console.Clear();
 
-                    Console.WriteLine("Use {< >} to navigate between pages. \nPress any other key to exit.");
+                    Console.WriteLine("Use {← and →} to navigate between pages. \nPress any other key to exit.");
 
                     for (int i = (index - 1) * elementsAmount; i < index * elementsAmount && i < personsList.Count; i++)
                     {
@@ -217,18 +217,18 @@ namespace ksiazkaZDanymi
                         $"}}");
                     }
 
-                    actionKey = Console.ReadKey().KeyChar;
+                    actionKey = Console.ReadKey().Key;
 
-                    if (actionKey == '>')
+                    if (actionKey == ConsoleKey.RightArrow)
                     {
                         index = index + 1 > Math.Ceiling(personsList.Count / System.Convert.ToDecimal(elementsAmount)) ? 1 : index + 1;
                     }
-                    else if (actionKey == '<')
+                    else if (actionKey == ConsoleKey.LeftArrow)
                     {
                         index = index - 1 < 1 ? (int)Math.Ceiling(personsList.Count / System.Convert.ToDecimal(elementsAmount)) : index - 1;
                     }
                 }
-                while (actionKey == '<' || actionKey == '>');
+                while (actionKey == ConsoleKey.LeftArrow || actionKey == ConsoleKey.RightArrow);
 
             }
             catch (InvalidOperationException ex)
@@ -251,7 +251,7 @@ namespace ksiazkaZDanymi
         {
             Console.Clear();
 
-            char actionKey;
+            ConsoleKey actionKey;
 
             int index = 1;
 
@@ -265,7 +265,7 @@ namespace ksiazkaZDanymi
                 while (true)
                 {
                     Console.Clear();
-                    Console.WriteLine("Use {< >} to navigate between sites and {[ ]} to change selected user.\n Press any other key to exit.");
+                    Console.WriteLine("Use {← and →} to navigate between sites and {↑ and ↓} to change selected user.\n Press any other key to exit.");
 
                     for (int i = (index - 1) * elementsAmount; i < index * elementsAmount && i < personsList.Count; i++)
                     {
@@ -298,29 +298,29 @@ namespace ksiazkaZDanymi
 
                     }
 
-                    actionKey = Console.ReadKey().KeyChar;
+                    actionKey = Console.ReadKey().Key;
 
                     switch (actionKey)
                     {
-                        case '>':
+                        case ConsoleKey.RightArrow:
                             index = index + 1 > Math.Ceiling(personsList.Count / 4.0) ? 1 : index + 1;
                             selectedPerson = (index - 1) * elementsAmount;
                             continue;
-                        case '<':
+                        case ConsoleKey.LeftArrow:
                             index = index - 1 < 1 ? (int)Math.Ceiling(personsList.Count / 4.0) : index - 1;
                             selectedPerson = (index - 1) * elementsAmount;
                             continue;
-                        case ']':
+                        case ConsoleKey.UpArrow:
                             selectedPerson = selectedPerson + 1 >= index * elementsAmount || selectedPerson + 1 >= personsList.Count ? (index - 1) * elementsAmount : selectedPerson + 1;
                             continue;
-                        case '[':
+                        case ConsoleKey.DownArrow:
                             selectedPerson = selectedPerson - 1 < (index - 1) * elementsAmount ? index * elementsAmount - 1 : selectedPerson - 1;
                             if (selectedPerson > personsList.Count)
                             {
                                 selectedPerson = personsList.Count - 1;
                             }
                             continue;
-                        case (char)13:
+                        case ConsoleKey.Enter:
                             Console.Clear();
                             commandHolder.Reset();
 
@@ -476,7 +476,7 @@ namespace ksiazkaZDanymi
 
             int personToDelete;
 
-            char actionKey;
+            ConsoleKey actionKey;
 
 
 
@@ -503,7 +503,7 @@ namespace ksiazkaZDanymi
                     while (true)
                     {
                         Console.Clear();
-                        Console.WriteLine("Use {[ ]} to change selected option.\n Press any other key to exit.");
+                        Console.WriteLine("Use {↑ and ↓} to change selected option.\n Press any other key to exit.");
 
                         Console.WriteLine($"Are you sure you want to delete user with ID: {personToDelete}");
 
@@ -522,17 +522,17 @@ namespace ksiazkaZDanymi
                             Console.WriteLine(options[i]);
                         }
 
-                        actionKey = Console.ReadKey().KeyChar;
+                        actionKey = Console.ReadKey().Key;
 
                         switch (actionKey)
                         {
-                            case ']':
+                            case ConsoleKey.DownArrow:
                                 selectedOption = selectedOption + 1 >= options.Length ? 0 : selectedOption + 1;
                                 continue;
-                            case '[':
+                            case ConsoleKey.UpArrow:
                                 selectedOption = selectedOption - 1 < 0 ? options.Length - 1 : selectedOption - 1;
                                 continue;
-                            case (char)13:
+                            case ConsoleKey.Enter:
                                 if (selectedOption == 0)
                                 {
                                     try
@@ -601,7 +601,7 @@ namespace ksiazkaZDanymi
 
             int personToModify;
 
-            char actionKey;
+            ConsoleKey actionKey;
 
 
             Dictionary<string, string> userInputs;
@@ -629,7 +629,7 @@ namespace ksiazkaZDanymi
                     while (true)
                     {
                         Console.Clear();
-                        Console.WriteLine("Use {[ ]} to change selected option.\n Press any other key to exit.");
+                        Console.WriteLine("Use {↑ and ↓} to change selected option.\n Press any other key to exit.");
 
                         Console.WriteLine($"Are you sure you want to modify data of user with ID: {personToModify}");
 
@@ -648,17 +648,17 @@ namespace ksiazkaZDanymi
                             Console.WriteLine(options[i]);
                         }
 
-                        actionKey = Console.ReadKey().KeyChar;
+                        actionKey = Console.ReadKey().Key;
 
                         switch (actionKey)
                         {
-                            case ']':
+                            case ConsoleKey.DownArrow:
                                 selectedOption = selectedOption + 1 >= options.Length ? 0 : selectedOption + 1;
                                 continue;
-                            case '[':
+                            case ConsoleKey.UpArrow:
                                 selectedOption = selectedOption - 1 < 0 ? options.Length - 1 : selectedOption - 1;
                                 continue;
-                            case (char)13:
+                            case ConsoleKey.Enter:
                                 if (selectedOption == 0)
                                 {
                                     try
@@ -728,7 +728,7 @@ namespace ksiazkaZDanymi
 
         private void ShowMenu()
         {
-            char actionKey = ' ';
+            ConsoleKey actionKey;
 
 
             int selectedOption = 0;
@@ -745,7 +745,7 @@ namespace ksiazkaZDanymi
                         Console.Clear();
                         Console.WriteLine("Welcome to the program 'Phone Book'. \nThis is simple utility working on MySQLite which provides methods to perform particular operations on records concerned persons in database.");
                         Console.WriteLine("Choose what you want to do by selecting option from the list below.");
-                        Console.WriteLine("Use {[ ]} to change selected option, ENTER to choose.");
+                        Console.WriteLine("Use {↑ and ↓} to change selected option, ENTER to choose.");
                         Console.WriteLine();
 
                         for (int i = 0; i < options.Length; i++)
@@ -763,17 +763,17 @@ namespace ksiazkaZDanymi
                             Console.WriteLine(options[i]);
                         }
 
-                        actionKey = Console.ReadKey().KeyChar;
+                        actionKey = Console.ReadKey().Key;
 
                         switch (actionKey)
                         {
-                            case ']':
+                            case ConsoleKey.DownArrow:
                                 selectedOption = selectedOption + 1 >= options.Length ? 0 : selectedOption + 1;
                                 continue;
-                            case '[':
+                            case ConsoleKey.UpArrow:
                                 selectedOption = selectedOption - 1 < 0 ? options.Length - 1 : selectedOption - 1;
                                 continue;
-                            case (char)13:
+                            case ConsoleKey.Enter:
                                 break;
                             default:
                                 continue;
