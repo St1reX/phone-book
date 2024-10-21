@@ -69,7 +69,8 @@ namespace ksiazkaZDanymi
 
                     commandHolder = new SQLiteCommand(createTableQuery, connection);
                     commandHolder.ExecuteNonQuery();
-                    Console.WriteLine("Table 'Persons' created successfully.");
+                    Console.WriteLine("Table 'Persons' created successfully. \nPress any button to continue.");
+                    Console.ReadKey();
                 }
                 else
                 {
@@ -91,7 +92,7 @@ namespace ksiazkaZDanymi
             {
                 personsList.Clear();
 
-                commandHolder.CommandText = orderBy == null ? "SELECT * FROM Person" : $"SELECT * FROM Persons ORDER BY {orderBy}";
+                commandHolder.CommandText = orderBy == null ? "SELECT * FROM Persons" : $"SELECT * FROM Persons ORDER BY {orderBy}";
                 var reader = commandHolder.ExecuteReader();
 
                 while (reader.Read())
@@ -106,10 +107,16 @@ namespace ksiazkaZDanymi
                 }
 
                 reader.Close();
+
             }
             catch(Exception ex)
             {
                 throw new Exception("Problem occurred while fetching records from database: \n" + ex.Message);
+            }
+
+            if (personsList.Count == 0)
+            {
+                throw new InvalidOperationException("Table Persons in database are empty. No elements to select/display. You need to add at least one user before using this function.");
             }
         }
 
@@ -192,11 +199,6 @@ namespace ksiazkaZDanymi
                     FetchPersonsFromDatabase();
                 }
 
-                if (personsList.Count == 0)
-                {
-                    throw new InvalidOperationException("Table Persons in database are empty. No elements to display.");
-                }
-
                 do
                 {
                     Console.Clear();
@@ -255,14 +257,10 @@ namespace ksiazkaZDanymi
 
             int selectedPerson = 0;
 
-            FetchPersonsFromDatabase();
 
             try
             {
-                if (personsList.Count == 0)
-                {
-                    throw new InvalidOperationException("Table Persons in database are empty. No elements to select.");
-                }
+                FetchPersonsFromDatabase();
 
                 while (true)
                 {
@@ -489,6 +487,8 @@ namespace ksiazkaZDanymi
 
             try
             {
+                FetchPersonsFromDatabase();
+
                 while (true)
                 {
                     personToDelete = SelectFromListMembers();
@@ -663,7 +663,7 @@ namespace ksiazkaZDanymi
                                 {
                                     try
                                     {
-                                        commandHolder.CommandText = $"UPDATEs Persons SET name = @name, surname = @surname, phone_number = @phone_number, mail = @mail, date_of_birth = @date_of_birth WHERE person_id = @personID";
+                                        commandHolder.CommandText = $"UPDATE Persons SET name = @name, surname = @surname, phone_number = @phone_number, mail = @mail, date_of_birth = @date_of_birth WHERE person_id = @personID";
 
                                         commandHolder.Parameters.AddWithValue("@personID", personToModify);
                                         commandHolder.Parameters.AddWithValue("@name", userInputs["name"]);
@@ -729,7 +729,6 @@ namespace ksiazkaZDanymi
         private void ShowMenu()
         {
             char actionKey = ' ';
-
 
 
             int selectedOption = 0;
