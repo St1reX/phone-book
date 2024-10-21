@@ -804,7 +804,6 @@ namespace ksiazkaZDanymi
                             return;
                         default:
                             Console.Clear();
-                            Console.WriteLine("Option you selected is not available.");
                             break;
                     }
 
