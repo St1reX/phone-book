@@ -155,6 +155,7 @@ namespace ksiazkaZDanymi
             int selectedOption = 0;
             ConsoleKey actionKey;
 
+            communicates.Add("Use {↑ and ↓} to change selected option, ENTER to choose.");
             communicates.Add("Press ESC to exit.");
             communicates.Add("\n");
 
@@ -727,8 +728,7 @@ namespace ksiazkaZDanymi
             {
                 "Welcome to the program 'Phone Book'.",
                 "This is simple utility working on MySQLite which provides methods to perform particular operations on records concerned persons in database.",
-                "Choose what you want to do by selecting option from the list below.",
-                "Use {↑ and ↓} to change selected option, ENTER to choose."
+                "Choose what you want to do by selecting option from the list below."
             };
 
             while (true)
