@@ -11,7 +11,6 @@ C:\Users\uryga\Documents\GitHub\phone-book\phoneBook\phoneBook\bin\Debug\EntityF
 C:\Users\uryga\Documents\GitHub\phone-book\phoneBook\phoneBook\bin\Debug\System.Data.SQLite.xml
 C:\Users\uryga\Documents\GitHub\phone-book\phoneBook\phoneBook\obj\Debug\phoneBook.csproj.AssemblyReference.cache
 C:\Users\uryga\Documents\GitHub\phone-book\phoneBook\phoneBook\obj\Debug\phoneBook.csproj.CoreCompileInputs.cache
-C:\Users\uryga\Documents\GitHub\phone-book\phoneBook\phoneBook\obj\Debug\phoneBook.csproj.CopyComplete
 C:\Users\uryga\Documents\GitHub\phone-book\phoneBook\phoneBook\obj\Debug\phoneBook.exe
 C:\Users\uryga\Documents\GitHub\phone-book\phoneBook\phoneBook\obj\Debug\phoneBook.pdb
 C:\Users\4tpJakub_Uryga\Desktop\phone-book-main\phoneBook\phoneBook\bin\Debug\phoneBook.exe.config
@@ -30,3 +29,4 @@ C:\Users\4tpJakub_Uryga\Desktop\phone-book-main\phoneBook\phoneBook\obj\Debug\ph
 C:\Users\4tpJakub_Uryga\Desktop\phone-book-main\phoneBook\phoneBook\obj\Debug\phoneBook.csproj.Up2Date
 C:\Users\4tpJakub_Uryga\Desktop\phone-book-main\phoneBook\phoneBook\obj\Debug\phoneBook.exe
 C:\Users\4tpJakub_Uryga\Desktop\phone-book-main\phoneBook\phoneBook\obj\Debug\phoneBook.pdb
+C:\Users\uryga\Documents\GitHub\phone-book\phoneBook\phoneBook\obj\Debug\phoneBook.csproj.Up2Date
