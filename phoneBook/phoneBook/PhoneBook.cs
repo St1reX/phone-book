@@ -47,7 +47,7 @@ namespace ksiazkaZDanymi
 
 
         //HELPER FUNCTIONS
-        private int SelectFromListMembers(int elementsAmount = 4)
+        private int SelectFromListMembers(int elementsAmount = 5)
         {
             Console.Clear();
 
@@ -106,13 +106,13 @@ namespace ksiazkaZDanymi
                             index = index + 1 > Math.Ceiling(recordsAmount / System.Convert.ToDecimal(elementsAmount)) ? 1 : index + 1;
                             selectedPerson = 0;
 
-                            FetchPersonsFromDatabase(elementsAmount, (index - 1) * 4);
+                            FetchPersonsFromDatabase(elementsAmount, (index - 1) * elementsAmount);
                             continue;
                         case ConsoleKey.LeftArrow:
                             index = index - 1 < 1 ? (int)Math.Ceiling(recordsAmount / System.Convert.ToDecimal(elementsAmount)) : index - 1;
                             selectedPerson = 0;
 
-                            FetchPersonsFromDatabase(elementsAmount, (index - 1) * 4);
+                            FetchPersonsFromDatabase(elementsAmount, (index - 1) * elementsAmount);
                             continue;
                         case ConsoleKey.UpArrow:
                             selectedPerson = selectedPerson - 1 < 0 ? personsList.Count - 1 : selectedPerson - 1;
@@ -408,7 +408,7 @@ namespace ksiazkaZDanymi
                 }
             } 
         }
-        private void DisplayListMembers(bool displaySorted = false, bool filterRecords = false, int elementsAmount = 4)
+        private void DisplayListMembers(bool displaySorted = false, bool filterRecords = false, int elementsAmount = 3)
         {
             Console.Clear();
 
@@ -642,9 +642,11 @@ namespace ksiazkaZDanymi
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                throw;
+                Console.WriteLine("Error occured while displaying users: " + ex.Message);
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
             }
             finally
             {
@@ -734,9 +736,11 @@ namespace ksiazkaZDanymi
                 Console.WriteLine("Press any key to continue.");
                 Console.ReadKey();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw;
+                Console.WriteLine("Error occured while displaying users: " + ex.Message);
+                Console.WriteLine("Press any key to continue.");
+                Console.ReadKey();
             }
             finally
             {
