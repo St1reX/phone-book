@@ -150,20 +150,21 @@ namespace ksiazkaZDanymi
             }
 
         }
-        private int SelectFromGivenOptions(List<string> options, List<string> communicates)
+        private int SelectFromGivenOptions(List<string> options, List<string> comunicates)
         {
             int selectedOption = 0;
             ConsoleKey actionKey;
 
-            communicates.Add("Use {↑ and ↓} to change selected option, ENTER to choose.");
-            communicates.Add("Press ESC to exit.");
-            communicates.Add("\n");
+            var tmpCommunicates = comunicates.ToList();
+            tmpCommunicates.Add("Use {↑ and ↓} to change selected option, ENTER to choose.");
+            tmpCommunicates.Add("Press ESC to exit.");
+            tmpCommunicates.Add("\n");
 
             while (true)
             {
                 Console.Clear();
 
-                foreach (var communicate in communicates)
+                foreach (var communicate in tmpCommunicates)
                 {
                     Console.WriteLine(communicate);
                 }
@@ -195,8 +196,10 @@ namespace ksiazkaZDanymi
                         selectedOption = selectedOption - 1 < 0 ? options.Count - 1 : selectedOption - 1;
                         continue;
                     case ConsoleKey.Enter:
+                        tmpCommunicates.Clear();
                         return selectedOption;
                     case ConsoleKey.Escape:
+                        tmpCommunicates.Clear();
                         return -1;
                     default:
                         continue;
@@ -383,10 +386,15 @@ namespace ksiazkaZDanymi
             Console.Clear();
 
             List<string> columns = new List<string>();
+
+            List<string> communicates = new List<string> 
+            {
+                "Select the column by which the records should be sorted."
+            };
             int selectedOption = 0;
 
-            ConsoleKey actionKey;
 
+            ConsoleKey actionKey;
             int index = 1;
 
             try
@@ -407,49 +415,7 @@ namespace ksiazkaZDanymi
 
                     reader.Close();
 
-                    while (true)
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Select the column by which the records should be sorted.");
-                        Console.WriteLine("Use {↑ and ↓} to change selected option, ENTER to choose. Press any other key to exit.");
-                        Console.WriteLine();
-
-                        for (int i = 0; i < columns.Count; i++)
-                        {
-                            if (i == selectedOption)
-                            {
-                                Console.ForegroundColor = ConsoleColor.Green;
-
-                                Console.WriteLine(" > " + columns[i]);
-
-                                Console.ResetColor();
-                                continue;
-                            }
-
-                            Console.WriteLine(columns[i]);
-                        }
-
-                        actionKey = Console.ReadKey().Key;
-
-                        switch (actionKey)
-                        {
-                            case ConsoleKey.DownArrow:
-                                selectedOption = selectedOption + 1 >= columns.Count ? 0 : selectedOption + 1;
-                                continue;
-                            case ConsoleKey.UpArrow:
-                                selectedOption = selectedOption - 1 < 0 ? columns.Count - 1 : selectedOption - 1;
-                                continue;
-                            case ConsoleKey.Enter:
-                                commandHolder.Reset();
-                                break;
-                            default:
-                                commandHolder.Reset();
-                                Console.Clear();
-                                return;
-                        }
-
-                        break;
-                    }
+                    selectedOption = SelectFromGivenOptions(columns, communicates);
                 }
 
                 while (true)
@@ -593,6 +559,8 @@ namespace ksiazkaZDanymi
                             commandHolder.Parameters.Clear();
                             Console.Clear();
                             return;
+                        case -1:
+                            return;
                     }
 
                     Console.WriteLine("User deleted. Do you want to delete another? Press Y for Yes, any other key to exit.");
@@ -683,6 +651,8 @@ namespace ksiazkaZDanymi
                             commandHolder.Parameters.Clear();
                             Console.Clear();
                             return;
+                        case -1:
+                            return;
                     }
 
                     Console.WriteLine("User modified. Do you want to modify another person data? Press Y for Yes, any other key to exit.");
@@ -716,11 +686,11 @@ namespace ksiazkaZDanymi
 
             List<string> options = new List<string>
             {
-                "Delete user (selectable)",
-                "Add new user",
+                "Delete record (selectable)",
+                "Add record",
                 "Display all users",
-                "Modify user (selectable)",
-                "Sort users (selectable)",
+                "Modify record (selectable)",
+                "Sort records (selectable)",
                 "Terminate the program"
             };
 
